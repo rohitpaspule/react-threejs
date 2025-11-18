@@ -7,7 +7,8 @@ export interface BlogFrontmatter {
     lng: number
     alt?: number
   }
-  ge360Link?: string // Google Earth 360 link
+  ge360Link?: string // Google Earth 360 link (opens in new tab)
+  panorama360Image?: string // 360° equirectangular image URL for immersive background
   ambientSoundURL?: string
   previewImage: string
   timePref?: 'day' | 'night' | 'auto' // Override time of day

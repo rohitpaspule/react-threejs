@@ -74,6 +74,7 @@ export function useAudio({
         }, fadeOutDuration)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url, loop, audioEnabled])
 
   // Handle mute changes

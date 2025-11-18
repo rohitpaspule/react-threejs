@@ -11,7 +11,7 @@ An immersive 3D blog platform where blog posts are **experiences**, not just tex
 - 🎵 **Ambient Audio** - Location-specific soundscapes with smart autoplay handling
 - 🌌 **Time-Aware Sky** - Dynamic day/night cycles based on local time
 - ✨ **Aurora Effects** - Realistic Aurora Borealis for polar regions at night
-- 🗺️ **Google Earth 360 Integration** - Optional immersive Earth views
+- 🗺️ **Google Earth Integration** - Direct links to view locations in Google Earth
 - 📱 **Responsive Design** - Works on desktop, tablet, and mobile
 - ♿ **Accessible** - WebGL fallback, keyboard navigation, high-contrast support
 - 🚀 **Performance Optimized** - Code splitting, lazy loading, and efficient rendering
@@ -360,7 +360,7 @@ src/utils/
 
 2. **Lazy Loading**
    - Audio files load on demand
-   - Google Earth iframes lazy load
+   - Google Earth links open in new tabs (no iframe overhead)
    - Images use Next.js Image component
 
 3. **Asset Optimization**

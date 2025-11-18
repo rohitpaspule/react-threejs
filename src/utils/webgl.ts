@@ -22,8 +22,8 @@ export function getWebGLCapabilities(): {
 } {
   try {
     const canvas = document.createElement('canvas')
-    const gl =
-      canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+    const gl = (canvas.getContext('webgl') ||
+      canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null
 
     if (!gl) {
       return { supported: false }
@@ -36,8 +36,8 @@ export function getWebGLCapabilities(): {
 
     return {
       supported: true,
-      maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE),
-      renderer,
+      maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE) as number,
+      renderer: renderer as string,
     }
   } catch (e) {
     return { supported: false }

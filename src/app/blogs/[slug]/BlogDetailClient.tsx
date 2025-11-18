@@ -11,6 +11,8 @@ import { useAudio } from '@/hooks/useAudio'
 import { FloatingPanel } from '@/components/ui/FloatingPanel'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { WebGLFallback } from '@/components/ui/WebGLFallback'
+import { GoogleMapsView } from '@/components/ui/GoogleMapsView'
+import { Panorama360Viewer } from '@/components/ui/Panorama360Viewer'
 import { isWebGLSupported } from '@/utils/webgl'
 import { blogCoordsToPosition } from '@/utils/coordinates'
 
@@ -25,7 +27,8 @@ interface BlogDetailClientProps {
 
 export function BlogDetailClient({ blog }: BlogDetailClientProps) {
   const [mounted, setMounted] = useState(false)
-  const [showEarthView, setShowEarthView] = useState(false)
+  const [showPanorama, setShowPanorama] = useState(false)
+  const [showMapView, setShowMapView] = useState(false)
   const { setWebglSupported, webglSupported, setCurrentBlogId, audioEnabled } =
     useAppStore()
 
@@ -81,27 +84,66 @@ export function BlogDetailClient({ blog }: BlogDetailClientProps) {
         />
       </div>
 
-      {/* Google Earth 360 View Toggle */}
-      {blog.frontmatter.ge360Link && (
+      {/* 360° Panorama View Toggle (if panorama image available) */}
+      {blog.frontmatter.panorama360Image && (
         <button
-          onClick={() => setShowEarthView(!showEarthView)}
-          className="fixed top-20 right-4 z-40 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-lg"
+          onClick={() => setShowPanorama(!showPanorama)}
+          className="fixed top-20 right-4 z-40 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-lg transition-colors"
         >
-          {showEarthView ? '🌍 Hide Earth View' : '🗺️ Show Earth View'}
+          {showPanorama ? '🌍 Hide 360° View' : '📷 Show 360° View'}
         </button>
       )}
 
-      {/* Google Earth 360 iframe (lazy loaded) */}
-      {showEarthView && blog.frontmatter.ge360Link && (
-        <div className="fixed inset-0 z-30 pointer-events-none">
-          <iframe
-            src={blog.frontmatter.ge360Link}
-            className="w-full h-full opacity-50 pointer-events-auto"
-            title="Google Earth 360 View"
-            loading="lazy"
-            allow="xr-spatial-tracking"
-          />
-        </div>
+      {/* 360° Panorama Viewer */}
+      {showPanorama && blog.frontmatter.panorama360Image && (
+        <Panorama360Viewer
+          imageUrl={blog.frontmatter.panorama360Image}
+          onClose={() => setShowPanorama(false)}
+        />
+      )}
+
+      {/* Fallback: Satellite Map View Toggle (Google Maps - requires API key) */}
+      {!blog.frontmatter.panorama360Image && (
+        <button
+          onClick={() => setShowMapView(!showMapView)}
+          className="fixed top-20 right-4 z-40 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-lg transition-colors"
+        >
+          {showMapView ? '🌍 Hide Map' : '🗺️ Show Satellite Map'}
+        </button>
+      )}
+
+      {/* Google Maps Satellite View Overlay */}
+      {showMapView && !blog.frontmatter.panorama360Image && (
+        <GoogleMapsView
+          latitude={blog.frontmatter.coords.lat}
+          longitude={blog.frontmatter.coords.lng}
+          onClose={() => setShowMapView(false)}
+        />
+      )}
+
+      {/* Google Earth Link (opens in new tab) */}
+      {blog.frontmatter.ge360Link && (
+        <a
+          href={blog.frontmatter.ge360Link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed top-36 right-4 z-40 px-4 py-2 bg-primary-700/80 hover:bg-primary-700 text-white text-sm rounded-lg shadow-lg transition-colors flex items-center gap-2"
+        >
+          Open in Google Earth
+          <svg
+            className="w-3 h-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </a>
       )}
 
       {/* Floating Content Panel */}

@@ -18,7 +18,17 @@ This document provides detailed technical information about special features and
 
 ### Overview
 
-The platform supports embedding Google Earth 360° views as an optional overlay on blog detail pages. This creates an immersive background that users can toggle on/off.
+The platform integrates Google Earth Web to provide additional geographic context for blog posts. When a blog includes a `ge360Link`, a button appears that opens the location in Google Earth in a new tab.
+
+### Why Not Iframe Embedding?
+
+**Important**: Google Earth Web cannot be embedded in iframes due to security restrictions:
+
+- **X-Frame-Options**: Google sets `X-Frame-Options: DENY` or `SAMEORIGIN`
+- **Content Security Policy**: Prevents iframe embedding from external domains
+- **403 Forbidden**: Attempting to embed returns a 403 error
+
+This is intentional by Google to prevent unauthorized embedding and ensure users interact with Google Earth directly on their platform.
 
 ### Implementation
 
@@ -38,13 +48,13 @@ https://earth.google.com/web/@LAT,LNG,ALT,DISTANCE,HEADING,TILT,ROLL
 Parameters:
 - `LAT`: Latitude
 - `LNG`: Longitude
-- `ALT`: Altitude
+- `ALT`: Altitude (in meters)
 - `DISTANCE`: Camera distance from ground
 - `HEADING`: Camera heading (0-360°)
-- `TILT`: Camera tilt angle
+- `TILT`: Camera tilt angle (0-90°)
 - `ROLL`: Camera roll angle
 
-#### 2. Embedding in Blog Posts
+#### 2. Adding to Blog Posts
 
 Add to frontmatter:
 ```yaml
@@ -53,37 +63,53 @@ ge360Link: "https://earth.google.com/web/@89.5,0,0a,22251752.77375655d,35y,0h,0t
 
 #### 3. Rendering Implementation
 
-The iframe is lazy-loaded and uses pointer-events for proper UX:
+The link opens Google Earth in a new tab with security attributes:
 
 ```tsx
-{showEarthView && blog.frontmatter.ge360Link && (
-  <div className="fixed inset-0 z-30 pointer-events-none">
-    <iframe
-      src={blog.frontmatter.ge360Link}
-      className="w-full h-full opacity-50 pointer-events-auto"
-      title="Google Earth 360 View"
-      loading="lazy"
-      allow="xr-spatial-tracking"
-    />
-  </div>
+{blog.frontmatter.ge360Link && (
+  <a
+    href={blog.frontmatter.ge360Link}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="fixed top-20 right-4 z-40 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-lg"
+  >
+    🗺️ View in Google Earth
+    {/* External link icon */}
+  </a>
 )}
 ```
 
-### Cross-Origin Considerations
+**Security Attributes**:
+- `target="_blank"`: Opens in new tab
+- `rel="noopener"`: Prevents new tab from accessing `window.opener`
+- `rel="noreferrer"`: Doesn't send referrer information
 
-**Issue**: Google Earth iframes run in a separate origin, limiting JS interaction.
+### User Experience
 
-**Solutions**:
-- Use opacity to blend with 3D background
-- Layer content panel above iframe (higher z-index)
-- Use `pointer-events-none` on container, `pointer-events-auto` on iframe for proper click handling
+When users click the "View in Google Earth" button:
+1. Google Earth opens in a new tab
+2. The exact view specified in the URL is loaded
+3. Users can interact with Google Earth's full feature set
+4. The original blog tab remains open
+5. Users can easily switch between tabs
 
-### Performance Tips
+### Benefits of New Tab Approach
 
-1. **Lazy Loading**: Always use `loading="lazy"` attribute
-2. **Toggle Visibility**: Don't mount iframe until user clicks toggle button
-3. **Opacity**: Lower opacity (40-60%) reduces visual complexity
-4. **Mobile**: Consider disabling on mobile devices for performance
+✅ **Works Reliably**: No 403 errors or CORS issues
+✅ **Full Features**: Users get complete Google Earth functionality
+✅ **Better Performance**: No iframe overhead on blog page
+✅ **Security**: Proper isolation between sites
+✅ **Mobile Friendly**: Works better on mobile devices
+
+### Alternative: Deep Links
+
+For mobile apps, you can also use Google Earth mobile deep links:
+
+```
+google-earth://latitude,longitude
+```
+
+However, web URLs are more universal and work across all platforms.
 
 ---
 
