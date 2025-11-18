@@ -50,8 +50,11 @@ export function Panorama360Viewer({
     containerRef.current.appendChild(renderer.domElement)
     rendererRef.current = renderer
 
-    // Load 360° texture
+    // Load 360° texture with CORS support
     const textureLoader = new THREE.TextureLoader()
+    // Enable CORS for cross-origin images
+    textureLoader.setCrossOrigin('anonymous')
+
     textureLoader.load(
       imageUrl,
       (texture) => {
