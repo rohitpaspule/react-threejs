@@ -12,6 +12,7 @@ import { FloatingPanel } from '@/components/ui/FloatingPanel'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { WebGLFallback } from '@/components/ui/WebGLFallback'
 import { GoogleMapsView } from '@/components/ui/GoogleMapsView'
+import { Panorama360Viewer } from '@/components/ui/Panorama360Viewer'
 import { isWebGLSupported } from '@/utils/webgl'
 import { blogCoordsToPosition } from '@/utils/coordinates'
 
@@ -26,6 +27,7 @@ interface BlogDetailClientProps {
 
 export function BlogDetailClient({ blog }: BlogDetailClientProps) {
   const [mounted, setMounted] = useState(false)
+  const [showPanorama, setShowPanorama] = useState(false)
   const [showMapView, setShowMapView] = useState(false)
   const { setWebglSupported, webglSupported, setCurrentBlogId, audioEnabled } =
     useAppStore()
@@ -82,16 +84,36 @@ export function BlogDetailClient({ blog }: BlogDetailClientProps) {
         />
       </div>
 
-      {/* Satellite Map View Toggle (Google Maps) */}
-      <button
-        onClick={() => setShowMapView(!showMapView)}
-        className="fixed top-20 right-4 z-40 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-lg transition-colors"
-      >
-        {showMapView ? '🌍 Hide Map' : '🗺️ Show Satellite Map'}
-      </button>
+      {/* 360° Panorama View Toggle (if panorama image available) */}
+      {blog.frontmatter.panorama360Image && (
+        <button
+          onClick={() => setShowPanorama(!showPanorama)}
+          className="fixed top-20 right-4 z-40 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-lg transition-colors"
+        >
+          {showPanorama ? '🌍 Hide 360° View' : '📷 Show 360° View'}
+        </button>
+      )}
+
+      {/* 360° Panorama Viewer */}
+      {showPanorama && blog.frontmatter.panorama360Image && (
+        <Panorama360Viewer
+          imageUrl={blog.frontmatter.panorama360Image}
+          onClose={() => setShowPanorama(false)}
+        />
+      )}
+
+      {/* Fallback: Satellite Map View Toggle (Google Maps - requires API key) */}
+      {!blog.frontmatter.panorama360Image && (
+        <button
+          onClick={() => setShowMapView(!showMapView)}
+          className="fixed top-20 right-4 z-40 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-lg transition-colors"
+        >
+          {showMapView ? '🌍 Hide Map' : '🗺️ Show Satellite Map'}
+        </button>
+      )}
 
       {/* Google Maps Satellite View Overlay */}
-      {showMapView && (
+      {showMapView && !blog.frontmatter.panorama360Image && (
         <GoogleMapsView
           latitude={blog.frontmatter.coords.lat}
           longitude={blog.frontmatter.coords.lng}

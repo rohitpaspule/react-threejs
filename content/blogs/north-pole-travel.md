@@ -6,6 +6,9 @@ coords:
   lat: 89.5
   lng: 0
 ge360Link: "https://earth.google.com/web/@89.5,0,0a,22251752.77375655d,35y,0h,0t,0r"
+panorama360Image: "https://polyhaven.com/a/snowy_forest_path_01"
+# Note: Replace with actual 360° image URL or use /panoramas/north-pole-360.jpg
+# Free 360° images available at: https://polyhaven.com/hdris (download and place in /public/panoramas/)
 ambientSoundURL: "https://cdn.freesound.org/previews/536/536111_11569784-lq.mp3"
 previewImage: "https://images.unsplash.com/photo-1520769945061-0a448c463865?w=800"
 timePref: auto
