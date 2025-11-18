@@ -25,7 +25,6 @@ interface BlogDetailClientProps {
 
 export function BlogDetailClient({ blog }: BlogDetailClientProps) {
   const [mounted, setMounted] = useState(false)
-  const [showEarthView, setShowEarthView] = useState(false)
   const { setWebglSupported, webglSupported, setCurrentBlogId, audioEnabled } =
     useAppStore()
 
@@ -81,27 +80,29 @@ export function BlogDetailClient({ blog }: BlogDetailClientProps) {
         />
       </div>
 
-      {/* Google Earth 360 View Toggle */}
+      {/* Google Earth 360 View - Opens in new tab */}
       {blog.frontmatter.ge360Link && (
-        <button
-          onClick={() => setShowEarthView(!showEarthView)}
-          className="fixed top-20 right-4 z-40 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-lg"
+        <a
+          href={blog.frontmatter.ge360Link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed top-20 right-4 z-40 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-lg transition-colors flex items-center gap-2"
         >
-          {showEarthView ? '🌍 Hide Earth View' : '🗺️ Show Earth View'}
-        </button>
-      )}
-
-      {/* Google Earth 360 iframe (lazy loaded) */}
-      {showEarthView && blog.frontmatter.ge360Link && (
-        <div className="fixed inset-0 z-30 pointer-events-none">
-          <iframe
-            src={blog.frontmatter.ge360Link}
-            className="w-full h-full opacity-50 pointer-events-auto"
-            title="Google Earth 360 View"
-            loading="lazy"
-            allow="xr-spatial-tracking"
-          />
-        </div>
+          🗺️ View in Google Earth
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </a>
       )}
 
       {/* Floating Content Panel */}
