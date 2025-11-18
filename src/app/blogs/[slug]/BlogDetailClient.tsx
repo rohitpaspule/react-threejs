@@ -11,6 +11,7 @@ import { useAudio } from '@/hooks/useAudio'
 import { FloatingPanel } from '@/components/ui/FloatingPanel'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { WebGLFallback } from '@/components/ui/WebGLFallback'
+import { GoogleMapsView } from '@/components/ui/GoogleMapsView'
 import { isWebGLSupported } from '@/utils/webgl'
 import { blogCoordsToPosition } from '@/utils/coordinates'
 
@@ -25,6 +26,7 @@ interface BlogDetailClientProps {
 
 export function BlogDetailClient({ blog }: BlogDetailClientProps) {
   const [mounted, setMounted] = useState(false)
+  const [showMapView, setShowMapView] = useState(false)
   const { setWebglSupported, webglSupported, setCurrentBlogId, audioEnabled } =
     useAppStore()
 
@@ -80,17 +82,34 @@ export function BlogDetailClient({ blog }: BlogDetailClientProps) {
         />
       </div>
 
-      {/* Google Earth 360 View - Opens in new tab */}
+      {/* Satellite Map View Toggle (Google Maps) */}
+      <button
+        onClick={() => setShowMapView(!showMapView)}
+        className="fixed top-20 right-4 z-40 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-lg transition-colors"
+      >
+        {showMapView ? '🌍 Hide Map' : '🗺️ Show Satellite Map'}
+      </button>
+
+      {/* Google Maps Satellite View Overlay */}
+      {showMapView && (
+        <GoogleMapsView
+          latitude={blog.frontmatter.coords.lat}
+          longitude={blog.frontmatter.coords.lng}
+          onClose={() => setShowMapView(false)}
+        />
+      )}
+
+      {/* Google Earth Link (opens in new tab) */}
       {blog.frontmatter.ge360Link && (
         <a
           href={blog.frontmatter.ge360Link}
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed top-20 right-4 z-40 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-lg transition-colors flex items-center gap-2"
+          className="fixed top-36 right-4 z-40 px-4 py-2 bg-primary-700/80 hover:bg-primary-700 text-white text-sm rounded-lg shadow-lg transition-colors flex items-center gap-2"
         >
-          🗺️ View in Google Earth
+          Open in Google Earth
           <svg
-            className="w-4 h-4"
+            className="w-3 h-3"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
